@@ -59,31 +59,31 @@ public class ParamValidatorJob {
     public NameParamValidator nameParamValidator(){
         return new NameParamValidator();
     }
-    //默认参数校验器
-    @Bean
-    public DefaultJobParametersValidator defaultJobParametersValidator(){
-        DefaultJobParametersValidator validator = new DefaultJobParametersValidator();
-        //必须参数
-        validator.setRequiredKeys(new String[]{"name"});
-        //可选参数
-        validator.setOptionalKeys(new String[]{"age"});
-        return validator;
-    }
-    //复合参数校验
-    @Bean
-    public CompositeJobParametersValidator compositeJobParametersValidator() throws Exception {
-        CompositeJobParametersValidator validator = new CompositeJobParametersValidator();
-        validator.setValidators(Arrays.asList(nameParamValidator(),defaultJobParametersValidator()));
-        validator.afterPropertiesSet();
-        return validator;
-    }
+//    //默认参数校验器
+//    @Bean
+//    public DefaultJobParametersValidator defaultJobParametersValidator(){
+//        DefaultJobParametersValidator validator = new DefaultJobParametersValidator();
+//        //必须参数
+//        validator.setRequiredKeys(new String[]{"name"});
+//        //可选参数
+//        validator.setOptionalKeys(new String[]{"age"});
+//        return validator;
+//    }
+//    //复合参数校验
+//    @Bean
+//    public CompositeJobParametersValidator compositeJobParametersValidator() throws Exception {
+//        CompositeJobParametersValidator validator = new CompositeJobParametersValidator();
+//        validator.setValidators(Arrays.asList(nameParamValidator(),defaultJobParametersValidator()));
+//        validator.afterPropertiesSet();
+//        return validator;
+//    }
 
-   /* @Bean
+    @Bean
     public Job job(){
         return jobBuilderFactory.get("name-param-validate-job").start(step1())
                 .validator(nameParamValidator())//指定参数校验器
                 .build();
-    }*/
+    }
 /*
     @Bean
 */

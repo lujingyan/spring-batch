@@ -46,7 +46,7 @@ public class HelloJob {
 
     @Bean
     public Job job(){
-        return jobBuilderFactory.get("hello-job").start(step1()).build();
+        return jobBuilderFactory.get("hello-job1").start(step1()).build();
     }
 
     public static void main(String[] args) {

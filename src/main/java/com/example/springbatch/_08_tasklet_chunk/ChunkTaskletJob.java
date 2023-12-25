@@ -1,29 +1,25 @@
-package com.example.springbatch._04_param_incr;
+package com.example.springbatch._08_tasklet_chunk;
 
-import com.example.springbatch._01_task.HelloJob;
+import com.example.springbatch._05_job_listener.JobStateListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import java.util.Map;
-
 @SpringBootApplication
 @EnableBatchProcessing
-public class IncrementParamJob {
+public class ChunkTaskletJob {
     //作业启动器
     @Autowired
     private JobLauncher jobLauncher;
@@ -34,58 +30,37 @@ public class IncrementParamJob {
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
 
-    @StepScope
     @Bean
-    public Tasklet tasklet(@Value("#{jobParameters['name']}") String valueName){
+    public Tasklet tasklet(){
         return new Tasklet() {
             @Override
             public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-                //方案一：使用chunkcontext
-                Map<String, Object> jobParameters = chunkContext.getStepContext().getJobParameters();
-                System.out.println("----paramjob-----run.id"+jobParameters.get("run.id"));
-
                 return RepeatStatus.FINISHED;
             }
         };
     }
-
-    @StepScope
-    @Bean
-    public Tasklet tasklet1(@Value("#{jobParameters['name']}") String valueName){
-        return new Tasklet() {
-            @Override
-            public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-                //方案一：使用chunkcontext
-                Map<String, Object> jobParameters = chunkContext.getStepContext().getJobParameters();
-                System.out.println("----paramjob-----daily"+jobParameters.get("daily"));
-
-                return RepeatStatus.FINISHED;
-            }
-        };
-    }
-
 
     //构建step对象
     @Bean
     public Step step1(){
-        return stepBuilderFactory.get("step1").tasklet(tasklet1(null)).build();
+        return stepBuilderFactory.get("step1").tasklet(tasklet()).build();
     }
 
     @Bean
-    public DailyTimestampParamIncrementer dailyTimestampParamIncrementer(){
-        return new DailyTimestampParamIncrementer();
+    public JobStateListener jobStateListener(){
+        return new JobStateListener();
     }
     @Bean
     public Job job(){
-        return jobBuilderFactory.get("increment-params-job")
+        return jobBuilderFactory.get("simple-tasklet-job")
                 .start(step1())
-//                .incrementer(new RunIdIncrementer())//自动增长
-                .incrementer(dailyTimestampParamIncrementer())//以时间戳增长
+                .incrementer(new RunIdIncrementer())
                 .build();
+        //job之间可以共享，step之间不能共享
     }
 
 
     public static void main(String[] args) {
-        SpringApplication.run(IncrementParamJob.class,args);
+        SpringApplication.run(ChunkTaskletJob.class,args);
     }
 }

@@ -10,6 +10,8 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.listener.JobListenerFactoryBean;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -62,9 +64,11 @@ public class StateListenerJob {
     }
     @Bean
     public Job job(){
-        return jobBuilderFactory.get("increment-params-job")
+        return jobBuilderFactory.get("listener-job")
                 .start(step1())
-                .listener(jobStateListener())
+                .incrementer(new RunIdIncrementer())
+//                .listener(jobStateListener())
+                .listener(JobListenerFactoryBean.getListener(new JobStateAnnoListener()))
                 .build();
     }
 

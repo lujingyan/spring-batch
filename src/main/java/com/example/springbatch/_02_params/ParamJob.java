@@ -39,9 +39,9 @@ public class ParamJob {
         return new Tasklet() {
             @Override
             public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-                //方案一：使用chunkcontext
-                Map<String, Object> jobParameters = chunkContext.getStepContext().getJobParameters();
-                System.out.println("----paramjob:name-----"+jobParameters.get("name"));
+//                //方案一：使用chunkcontext
+//                Map<String, Object> jobParameters = chunkContext.getStepContext().getJobParameters();
+//                System.out.println("----paramjob:name-----"+jobParameters.get("name"));
 
                 //方案二：使用@value
                 System.out.println("params---name:"+valueName);
